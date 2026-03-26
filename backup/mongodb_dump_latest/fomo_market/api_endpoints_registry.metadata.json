@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"2faeedc295834eb4871fe499175be6bb","collectionName":"api_endpoints_registry","type":"collection"}

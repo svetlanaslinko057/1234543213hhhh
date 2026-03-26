@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"0119aa374fb54b25b7329a2d1195dd31","collectionName":"smart_money_profiles","type":"collection"}

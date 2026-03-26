@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"fe4453a5e5f548bb89cb786cb03a134d","collectionName":"sentiment_keys","type":"collection"}

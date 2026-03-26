@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"key":{"$numberInt":"1"}},"name":"key_1","background":true,"unique":true},{"v":{"$numberInt":"2"},"key":{"slug":{"$numberInt":"1"}},"name":"slug_1","background":true}],"uuid":"518e32282fc242e98172a8b2b4bcc9a7","collectionName":"intel_funds","type":"collection"}
