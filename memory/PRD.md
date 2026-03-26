@@ -1,105 +1,51 @@
 # FOMO Crypto Intelligence Platform - PRD
 
-## Sprint 1.5 Complete - 2026-03-26
+## Original Problem Statement
+Клонировать репозиторий https://github.com/svetlanaslinko057/r4r4f4f4, изучить архитектуру и полностью поднять все сервисы.
 
-### 🎯 CRITICAL FIX: DENSE GRAPH
+## Architecture
+- **Frontend**: React с Tailwind CSS, порт 3000
+- **Backend**: NestJS (TypeScript) проксируется через FastAPI, порт 8001
+- **NestJS**: Порт 3001 (внутренний)
+- **Database**: MongoDB (fomo_market)
 
-**Before:**
-- coinvested_with: 21 edges
-- shares_investor_with: 137 edges
-- Total: ~177 edges
+## Core Features Implemented
+- ✅ Клонирование репозитория из GitHub
+- ✅ Восстановление базы данных из бэкапа (177k+ записей)
+- ✅ Миграция данных (funds, projects)
+- ✅ Сборка NestJS бэкенда (исправлены TypeScript ошибки)
+- ✅ Запуск всех сервисов через supervisor
+- ✅ API эндпоинты работают
 
-**After:**
-- coinvested_with: **47,708 edges** (2,270x increase!)
-- avg_weight: 12.2 (times together)
-- max_weight: 383 (au21 ↔ x21)
+## Database Statistics
+| Collection | Count |
+|------------|-------|
+| intel_funds | 9,293 |
+| intel_projects | 6,354 |
+| intel_investors | 18,959 |
+| intel_fundraising | 16,368 |
+| canonical_investors | 8,456 |
+| smart_money_profiles | 8,456 |
+| coinvest_relations | 177,033 |
 
-### Top Coinvested Pairs
-```
-au21 ↔ x21: 383 times, $230M volume
-magnus ↔ x21: 324 times, $344M volume
-au21 ↔ magnus: 301 times, $172M volume
-au21 ↔ ngc: 300 times, $1.3B volume
-```
+## Key API Endpoints
+- `GET /api/health` - Health check
+- `GET /api/intel/funds` - Crypto funds
+- `GET /api/intel/projects` - Projects
+- `GET /api/intel/investors/top` - Top investors
+- `GET /api/entities/stats` - Entity resolution stats
+- `GET /api/smart-money/stats` - Smart money analytics
+- `POST /api/auth/verify` - Authentication (password: fomo2024)
 
-### a16z Network (REAL DATA!)
-```
-a16z ↔ Coinbase: 164 times together
-a16z ↔ Polychain: 90 times
-a16z ↔ Hashed: 75 times
-a16z ↔ Multicoin: 66 times
-a16z ↔ Paradigm: 61 times
-```
+## What's Working
+- All backend APIs (tested via localhost:8001)
+- MongoDB with restored data
+- NestJS build and runtime
+- Frontend UI (login page)
 
----
+## Known Issues
+- External URL proxy may have delays during NestJS startup
+- Browser-based scraping disabled (Chromium not configured)
 
-## Changes Made
-
-### V2 Derived Edges Builder
-- Uses `coinvest_relations` (138k pre-computed!) instead of sparse graph_edges
-- Uses `intel_fundraising` for shared_investor edges
-- Bulk write operations (1000 batch size)
-- Progress logging every 10k records
-- Edge key normalization: `sorted(from, to) + type`
-
-### Confidence Formula
-```
-confidence = 
-  0.3 + 
-  countFactor × 0.3 +     // min(1.0, count/50)
-  recencyFactor × 0.2 +   // based on last_together
-  qualityFactor × 0.2     // quality_score/100
-```
-
----
-
-## API Endpoints
-
-### Graph Builders
-```bash
-POST /api/graph-builders/derived/build-all
-GET  /api/graph-builders/derived/stats
-GET  /api/graph-builders/derived/node/:nodeId
-GET  /api/graph-builders/derived/related/:nodeId?type=coinvested_with
-```
-
-### Example Query
-```javascript
-// Find all funds that coinvested with a16z
-db.graph_derived_edges.find({
-  $or: [
-    { from_node_id: /a16z/i },
-    { to_node_id: /a16z/i }
-  ],
-  relation_type: "coinvested_with"
-}).sort({weight: -1})
-```
-
----
-
-## Next Steps
-
-### P1 - Graph Snapshots
-- [ ] Create graph_snapshots collection
-- [ ] Store top nodes/edges for fast UI
-- [ ] Temporal snapshots for history
-
-### P1 - Scheduler
-- [ ] Tier-based scheduling (T1=10m, T2=15m, T3=30m)
-- [ ] Source priority orchestration
-
-### P2 - Complete Derived Edges
-- [ ] shares_investor_with (from fundraising)
-- [ ] worked_together (from people data)
-- [ ] shares_founder_with
-
----
-
-## Collections
-
-| Collection | Count | Purpose |
-|------------|-------|---------|
-| coinvest_relations | 138,175 | Pre-computed investor pairs |
-| graph_derived_edges | 47,708 | Intelligence edges |
-| intel_fundraising | 16,808 | Funding rounds |
-| intel_investors | 18,959 | Investors |
+## Date Completed
+2026-03-26
