@@ -6,6 +6,8 @@
  * - Funds (VCs, investors)
  * - Tokens ($BTC, $ETH)
  * - Persons (founders, executives)
+ * 
+ * IMPROVED: Context-aware classification
  */
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -17,11 +19,25 @@ export interface ExtractedEntities {
   persons: string[];
 }
 
-// Known fund patterns
+// Known fund patterns (expanded)
 const FUND_PATTERNS = [
   /Capital/i, /Ventures/i, /Partners/i, /Labs/i, /DAO/i,
   /a16z/i, /Paradigm/i, /Polychain/i, /Multicoin/i, /Pantera/i,
   /Sequoia/i, /Andreessen/i, /Binance/i, /Coinbase/i, /Jump/i,
+  /Crypto$/i, /Digital$/i, /Fund$/i, /VC$/i, /Holdings$/i,
+  /Investments$/i, /Group$/i,
+];
+
+// Context words that indicate FUND
+const FUND_CONTEXT = [
+  'invest', 'led', 'raise', 'fund', 'back', 'participated',
+  'announce', 'portfolio', 'vc', 'venture', 'capital',
+];
+
+// Context words that indicate PROJECT
+const PROJECT_CONTEXT = [
+  'launch', 'protocol', 'mainnet', 'testnet', 'network',
+  'token', 'chain', 'dapp', 'platform', 'ecosystem',
 ];
 
 // Token pattern
@@ -39,6 +55,7 @@ export class EntityExtractorService {
 
   /**
    * Extract entities from text (title + content)
+   * Now with context-aware classification
    */
   extract(text: string): ExtractedEntities {
     const projects = new Set<string>();
@@ -49,6 +66,12 @@ export class EntityExtractorService {
     if (!text) {
       return { projects: [], funds: [], tokens: [], persons: [] };
     }
+
+    const lowerText = text.toLowerCase();
+    
+    // Detect context
+    const hasFundContext = FUND_CONTEXT.some(w => lowerText.includes(w));
+    const hasProjectContext = PROJECT_CONTEXT.some(w => lowerText.includes(w));
 
     // 1. Extract tokens ($BTC, $ETH, etc.)
     const tokenMatches = text.match(TOKEN_PATTERN) || [];

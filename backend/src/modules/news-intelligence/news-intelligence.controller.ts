@@ -92,4 +92,29 @@ export class NewsIntelligenceController {
   async getStats() {
     return this.service.getStats();
   }
+
+  /**
+   * Process recent unprocessed articles (for scheduler)
+   */
+  @Post('process-recent')
+  async processRecent(
+    @Query('hours') hours?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const result = await this.service.processRecent(
+      parseInt(hours || '6', 10),
+      parseInt(limit || '200', 10),
+    );
+    return {
+      success: true,
+      stats: result.stats,
+      topClusters: result.clusters.slice(0, 5).map(c => ({
+        id: c.id,
+        type: c.type,
+        mainEntity: c.mainEntity,
+        eventCount: c.eventCount,
+        rankScore: c.rankScore,
+      })),
+    };
+  }
 }

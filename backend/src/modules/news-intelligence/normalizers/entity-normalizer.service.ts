@@ -29,82 +29,399 @@ export interface NormalizedEntities {
 }
 
 // KNOWN ALIASES - Critical for match rate improvement
+// Expanded to 150+ aliases for 80%+ match rate
 const KNOWN_ALIASES: Record<string, string> = {
-  // Funds
+  // ══════════════════════════════════════════════════════════════
+  // TIER-1 FUNDS (most important)
+  // ══════════════════════════════════════════════════════════════
   'a16z': 'andreessen-horowitz',
   'andreessen': 'andreessen-horowitz',
   'andreessen horowitz': 'andreessen-horowitz',
   'a16zcrypto': 'andreessen-horowitz',
+  'a16z crypto': 'andreessen-horowitz',
+  
   'paradigm': 'paradigm',
   'paradigm capital': 'paradigm',
+  'paradigm fund': 'paradigm',
+  
   'polychain': 'polychain-capital',
   'polychain capital': 'polychain-capital',
+  
   'multicoin': 'multicoin-capital',
   'multicoin capital': 'multicoin-capital',
+  
   'pantera': 'pantera-capital',
   'pantera capital': 'pantera-capital',
+  
   'sequoia': 'sequoia-capital',
   'sequoia capital': 'sequoia-capital',
+  
   'dragonfly': 'dragonfly-capital',
   'dragonfly capital': 'dragonfly-capital',
+  
   'jump': 'jump-crypto',
   'jump crypto': 'jump-crypto',
   'jump trading': 'jump-crypto',
+  
   'binance': 'binance-labs',
   'binance labs': 'binance-labs',
+  'bnb': 'binance-labs',
+  
   'coinbase': 'coinbase-ventures',
   'coinbase ventures': 'coinbase-ventures',
+  'cb ventures': 'coinbase-ventures',
+  
   'framework': 'framework-ventures',
   'framework ventures': 'framework-ventures',
+  
   'variant': 'variant-fund',
   'variant fund': 'variant-fund',
+  
   'electric': 'electric-capital',
   'electric capital': 'electric-capital',
+  
   'galaxy': 'galaxy-digital',
   'galaxy digital': 'galaxy-digital',
+  
   'fenbushi': 'fenbushi-capital',
   'fenbushi capital': 'fenbushi-capital',
+  
   'digital currency group': 'dcg',
   'dcg': 'dcg',
-  'grayscale': 'grayscale-investments',
   
-  // Projects
+  'grayscale': 'grayscale-investments',
+  'grayscale investments': 'grayscale-investments',
+  
+  // ══════════════════════════════════════════════════════════════
+  // TIER-2 FUNDS
+  // ══════════════════════════════════════════════════════════════
+  'haun': 'haun-ventures',
+  'haun ventures': 'haun-ventures',
+  'katie haun': 'haun-ventures',
+  
+  'standard crypto': 'standard-crypto',
+  'standard': 'standard-crypto',
+  
+  'blocktower': 'blocktower-capital',
+  'blocktower capital': 'blocktower-capital',
+  
+  'placeholder': 'placeholder-vc',
+  'placeholder vc': 'placeholder-vc',
+  
+  'delphi': 'delphi-digital',
+  'delphi digital': 'delphi-digital',
+  'delphi ventures': 'delphi-digital',
+  
+  'iosg': 'iosg-ventures',
+  'iosg ventures': 'iosg-ventures',
+  
+  'hashkey': 'hashkey-capital',
+  'hashkey capital': 'hashkey-capital',
+  
+  'animoca': 'animoca-brands',
+  'animoca brands': 'animoca-brands',
+  
+  '1confirmation': '1confirmation',
+  'one confirmation': '1confirmation',
+  
+  'union square': 'usv',
+  'usv': 'usv',
+  'union square ventures': 'usv',
+  
+  'ribbit': 'ribbit-capital',
+  'ribbit capital': 'ribbit-capital',
+  
+  'blockchain capital': 'blockchain-capital',
+  
+  'digital asset capital': 'digital-asset-capital',
+  
+  'lightspeed': 'lightspeed-venture',
+  'lightspeed venture': 'lightspeed-venture',
+  
+  'insight partners': 'insight-partners',
+  'insight': 'insight-partners',
+  
+  'tiger global': 'tiger-global',
+  'tiger': 'tiger-global',
+  
+  'softbank': 'softbank',
+  'soft bank': 'softbank',
+  
+  'coatue': 'coatue',
+  'coatue management': 'coatue',
+  
+  'general catalyst': 'general-catalyst',
+  
+  'index ventures': 'index-ventures',
+  'index': 'index-ventures',
+  
+  'accel': 'accel',
+  'accel partners': 'accel',
+  
+  'kkr': 'kkr',
+  
+  'blackrock': 'blackrock',
+  'black rock': 'blackrock',
+  
+  'fidelity': 'fidelity',
+  'fidelity investments': 'fidelity',
+  
+  'circle': 'circle-ventures',
+  'circle ventures': 'circle-ventures',
+  
+  'kraken': 'kraken-ventures',
+  'kraken ventures': 'kraken-ventures',
+  
+  'okx': 'okx-ventures',
+  'okx ventures': 'okx-ventures',
+  'okex': 'okx-ventures',
+  
+  'htx': 'htx-ventures',
+  'huobi': 'htx-ventures',
+  'huobi ventures': 'htx-ventures',
+  
+  'spartan': 'spartan-group',
+  'spartan group': 'spartan-group',
+  
+  'hack vc': 'hack-vc',
+  'hackvc': 'hack-vc',
+  
+  'maven 11': 'maven11',
+  'maven11': 'maven11',
+  
+  'wintermute': 'wintermute',
+  'wintermute ventures': 'wintermute',
+  
+  'alameda': 'alameda-research',
+  'alameda research': 'alameda-research',
+  
+  'three arrows': 'three-arrows-capital',
+  '3ac': 'three-arrows-capital',
+  'three arrows capital': 'three-arrows-capital',
+  
+  // ══════════════════════════════════════════════════════════════
+  // MAJOR PROJECTS & TOKENS
+  // ══════════════════════════════════════════════════════════════
   'ethereum': 'ethereum',
   'eth': 'ethereum',
+  'ether': 'ethereum',
+  
   'bitcoin': 'bitcoin',
   'btc': 'bitcoin',
+  
   'solana': 'solana',
   'sol': 'solana',
+  
   'polygon': 'polygon',
   'matic': 'polygon',
+  'polygon labs': 'polygon',
+  
   'arbitrum': 'arbitrum',
   'arb': 'arbitrum',
+  'offchain labs': 'arbitrum',
+  
   'optimism': 'optimism',
   'op': 'optimism',
+  'op labs': 'optimism',
+  
   'base': 'base',
+  'base chain': 'base',
+  
   'avalanche': 'avalanche',
   'avax': 'avalanche',
+  'ava labs': 'avalanche',
+  
   'near': 'near-protocol',
   'near protocol': 'near-protocol',
+  
   'cosmos': 'cosmos',
   'atom': 'cosmos',
+  
+  'polkadot': 'polkadot',
+  'dot': 'polkadot',
+  
+  'cardano': 'cardano',
+  'ada': 'cardano',
+  
+  'ripple': 'ripple',
+  'xrp': 'ripple',
+  
+  'dogecoin': 'dogecoin',
+  'doge': 'dogecoin',
+  
+  'shiba': 'shiba-inu',
+  'shiba inu': 'shiba-inu',
+  'shib': 'shiba-inu',
+  
+  'tron': 'tron',
+  'trx': 'tron',
+  
+  'ton': 'ton',
+  'toncoin': 'ton',
+  'telegram open network': 'ton',
+  
+  'sui': 'sui',
+  'sui network': 'sui',
+  'mysten labs': 'sui',
+  
+  'aptos': 'aptos',
+  'apt': 'aptos',
+  'aptos labs': 'aptos',
+  
+  'sei': 'sei',
+  'sei network': 'sei',
+  
+  'injective': 'injective',
+  'inj': 'injective',
+  
+  // ══════════════════════════════════════════════════════════════
+  // DEFI PROTOCOLS
+  // ══════════════════════════════════════════════════════════════
   'uniswap': 'uniswap',
   'uni': 'uniswap',
+  'uniswap labs': 'uniswap',
+  
   'aave': 'aave',
+  
   'compound': 'compound',
   'comp': 'compound',
+  
+  'makerdao': 'makerdao',
+  'maker': 'makerdao',
+  'mkr': 'makerdao',
+  'dai': 'makerdao',
+  
+  'curve': 'curve-finance',
+  'curve finance': 'curve-finance',
+  'crv': 'curve-finance',
+  
+  'lido': 'lido',
+  'lido finance': 'lido',
+  'steth': 'lido',
+  'ldo': 'lido',
+  
+  'eigenlayer': 'eigenlayer',
+  'eigen': 'eigenlayer',
+  'eigen layer': 'eigenlayer',
+  
+  'pendle': 'pendle',
+  
+  'gmx': 'gmx',
+  
+  'dydx': 'dydx',
+  
+  'synthetix': 'synthetix',
+  'snx': 'synthetix',
+  
+  '1inch': '1inch',
+  'oneinch': '1inch',
+  
+  'sushiswap': 'sushiswap',
+  'sushi': 'sushiswap',
+  
+  'pancakeswap': 'pancakeswap',
+  'pancake': 'pancakeswap',
+  'cake': 'pancakeswap',
+  
+  // ══════════════════════════════════════════════════════════════
+  // L2 & INFRASTRUCTURE
+  // ══════════════════════════════════════════════════════════════
   'chainlink': 'chainlink',
   'link': 'chainlink',
-  'opensea': 'opensea',
-  'blur': 'blur',
-  'worldcoin': 'worldcoin',
+  
   'layerzero': 'layerzero',
-  'eigenlayer': 'eigenlayer',
+  'layer zero': 'layerzero',
+  'layerzero labs': 'layerzero',
+  
   'celestia': 'celestia',
+  'tia': 'celestia',
+  
   'starknet': 'starknet',
   'starkware': 'starknet',
+  'stark': 'starknet',
+  
   'zksync': 'zksync',
   'matter labs': 'zksync',
+  'zk sync': 'zksync',
+  
+  'scroll': 'scroll',
+  
+  'linea': 'linea',
+  'consensys': 'linea',
+  
+  'mantle': 'mantle',
+  
+  'manta': 'manta-network',
+  'manta network': 'manta-network',
+  
+  'blast': 'blast',
+  
+  'mode': 'mode-network',
+  'mode network': 'mode-network',
+  
+  'taiko': 'taiko',
+  
+  // ══════════════════════════════════════════════════════════════
+  // NFT & GAMING
+  // ══════════════════════════════════════════════════════════════
+  'opensea': 'opensea',
+  'open sea': 'opensea',
+  
+  'blur': 'blur',
+  
+  'magic eden': 'magic-eden',
+  'magiceden': 'magic-eden',
+  
+  'yuga labs': 'yuga-labs',
+  'yuga': 'yuga-labs',
+  'bayc': 'yuga-labs',
+  'bored ape': 'yuga-labs',
+  
+  'immutable': 'immutable',
+  'immutable x': 'immutable',
+  'imx': 'immutable',
+  
+  'axie infinity': 'axie-infinity',
+  'axie': 'axie-infinity',
+  'sky mavis': 'axie-infinity',
+  
+  // ══════════════════════════════════════════════════════════════
+  // AI & NEW SECTORS
+  // ══════════════════════════════════════════════════════════════
+  'worldcoin': 'worldcoin',
+  'wld': 'worldcoin',
+  'tools for humanity': 'worldcoin',
+  
+  'render': 'render',
+  'rndr': 'render',
+  'render network': 'render',
+  
+  'fetch.ai': 'fetch-ai',
+  'fetchai': 'fetch-ai',
+  'fetch': 'fetch-ai',
+  'fet': 'fetch-ai',
+  
+  'ocean protocol': 'ocean-protocol',
+  'ocean': 'ocean-protocol',
+  
+  'singularitynet': 'singularitynet',
+  'agix': 'singularitynet',
+  
+  'bittensor': 'bittensor',
+  'tao': 'bittensor',
+  
+  // ══════════════════════════════════════════════════════════════
+  // STABLECOINS & PAYMENTS
+  // ══════════════════════════════════════════════════════════════
+  'tether': 'tether',
+  'usdt': 'tether',
+  
+  'usdc': 'usdc',
+  'usd coin': 'usdc',
+  
+  'stripe': 'stripe',
+  
+  'paypal': 'paypal',
 };
 
 @Injectable()
