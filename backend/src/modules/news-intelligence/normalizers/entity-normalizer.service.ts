@@ -4,6 +4,7 @@
  * BLOCK 6: Normalizes extracted entities to canonical IDs
  * - Matches against known entities in DB
  * - Handles aliases and variations
+ * - IMPROVED: Fuzzy matching + known aliases
  */
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -26,6 +27,85 @@ export interface NormalizedEntities {
   persons: NormalizedEntity[];
   all: NormalizedEntity[];
 }
+
+// KNOWN ALIASES - Critical for match rate improvement
+const KNOWN_ALIASES: Record<string, string> = {
+  // Funds
+  'a16z': 'andreessen-horowitz',
+  'andreessen': 'andreessen-horowitz',
+  'andreessen horowitz': 'andreessen-horowitz',
+  'a16zcrypto': 'andreessen-horowitz',
+  'paradigm': 'paradigm',
+  'paradigm capital': 'paradigm',
+  'polychain': 'polychain-capital',
+  'polychain capital': 'polychain-capital',
+  'multicoin': 'multicoin-capital',
+  'multicoin capital': 'multicoin-capital',
+  'pantera': 'pantera-capital',
+  'pantera capital': 'pantera-capital',
+  'sequoia': 'sequoia-capital',
+  'sequoia capital': 'sequoia-capital',
+  'dragonfly': 'dragonfly-capital',
+  'dragonfly capital': 'dragonfly-capital',
+  'jump': 'jump-crypto',
+  'jump crypto': 'jump-crypto',
+  'jump trading': 'jump-crypto',
+  'binance': 'binance-labs',
+  'binance labs': 'binance-labs',
+  'coinbase': 'coinbase-ventures',
+  'coinbase ventures': 'coinbase-ventures',
+  'framework': 'framework-ventures',
+  'framework ventures': 'framework-ventures',
+  'variant': 'variant-fund',
+  'variant fund': 'variant-fund',
+  'electric': 'electric-capital',
+  'electric capital': 'electric-capital',
+  'galaxy': 'galaxy-digital',
+  'galaxy digital': 'galaxy-digital',
+  'fenbushi': 'fenbushi-capital',
+  'fenbushi capital': 'fenbushi-capital',
+  'digital currency group': 'dcg',
+  'dcg': 'dcg',
+  'grayscale': 'grayscale-investments',
+  
+  // Projects
+  'ethereum': 'ethereum',
+  'eth': 'ethereum',
+  'bitcoin': 'bitcoin',
+  'btc': 'bitcoin',
+  'solana': 'solana',
+  'sol': 'solana',
+  'polygon': 'polygon',
+  'matic': 'polygon',
+  'arbitrum': 'arbitrum',
+  'arb': 'arbitrum',
+  'optimism': 'optimism',
+  'op': 'optimism',
+  'base': 'base',
+  'avalanche': 'avalanche',
+  'avax': 'avalanche',
+  'near': 'near-protocol',
+  'near protocol': 'near-protocol',
+  'cosmos': 'cosmos',
+  'atom': 'cosmos',
+  'uniswap': 'uniswap',
+  'uni': 'uniswap',
+  'aave': 'aave',
+  'compound': 'compound',
+  'comp': 'compound',
+  'chainlink': 'chainlink',
+  'link': 'chainlink',
+  'opensea': 'opensea',
+  'blur': 'blur',
+  'worldcoin': 'worldcoin',
+  'layerzero': 'layerzero',
+  'eigenlayer': 'eigenlayer',
+  'celestia': 'celestia',
+  'starknet': 'starknet',
+  'starkware': 'starknet',
+  'zksync': 'zksync',
+  'matter labs': 'zksync',
+};
 
 @Injectable()
 export class EntityNormalizerService {
@@ -84,8 +164,31 @@ export class EntityNormalizerService {
     type: 'project' | 'fund' | 'token' | 'person',
   ): Promise<NormalizedEntity> {
     const slug = this.slugify(name);
+    const lowerName = name.toLowerCase();
 
-    // Try cache first
+    // 1. Check known aliases FIRST (highest confidence)
+    if (KNOWN_ALIASES[lowerName]) {
+      return {
+        name,
+        canonicalId: KNOWN_ALIASES[lowerName],
+        type,
+        confidence: 0.98,
+        matched: true,
+      };
+    }
+
+    // Also check slug form
+    if (KNOWN_ALIASES[slug]) {
+      return {
+        name,
+        canonicalId: KNOWN_ALIASES[slug],
+        type,
+        confidence: 0.97,
+        matched: true,
+      };
+    }
+
+    // 2. Try cache
     if (type === 'fund' && this.fundCache.has(slug)) {
       return {
         name,
@@ -106,8 +209,22 @@ export class EntityNormalizerService {
       };
     }
 
-    // Try DB lookup
+    // 3. Try DB lookup
     const canonicalId = await this.lookupInDB(name, slug, type);
+
+    // 4. Try fuzzy matching if no exact match
+    if (!canonicalId) {
+      const fuzzyMatch = await this.fuzzyMatch(name, type);
+      if (fuzzyMatch) {
+        return {
+          name,
+          canonicalId: fuzzyMatch.id,
+          type,
+          confidence: fuzzyMatch.confidence,
+          matched: true,
+        };
+      }
+    }
 
     if (canonicalId) {
       // Update cache
@@ -252,5 +369,80 @@ export class EntityNormalizerService {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // FUZZY MATCHING
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Fuzzy match against cache
+   */
+  private async fuzzyMatch(
+    name: string,
+    type: string,
+  ): Promise<{ id: string; confidence: number } | null> {
+    const slug = this.slugify(name);
+    const cache = type === 'fund' ? this.fundCache : this.projectCache;
+
+    let bestMatch: { id: string; similarity: number } | null = null;
+
+    for (const [key, id] of cache.entries()) {
+      const similarity = this.stringSimilarity(slug, key);
+      
+      if (similarity > 0.85 && (!bestMatch || similarity > bestMatch.similarity)) {
+        bestMatch = { id, similarity };
+      }
+    }
+
+    if (bestMatch) {
+      return {
+        id: bestMatch.id,
+        confidence: Math.round(bestMatch.similarity * 100) / 100,
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Calculate string similarity (Levenshtein-based)
+   */
+  private stringSimilarity(s1: string, s2: string): number {
+    if (s1 === s2) return 1;
+    if (s1.length === 0 || s2.length === 0) return 0;
+
+    // Check if one is substring of other
+    if (s1.includes(s2) || s2.includes(s1)) {
+      const minLen = Math.min(s1.length, s2.length);
+      const maxLen = Math.max(s1.length, s2.length);
+      return minLen / maxLen;
+    }
+
+    // Levenshtein distance
+    const matrix: number[][] = [];
+    
+    for (let i = 0; i <= s1.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= s2.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= s1.length; i++) {
+      for (let j = 1; j <= s2.length; j++) {
+        const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost,
+        );
+      }
+    }
+
+    const distance = matrix[s1.length][s2.length];
+    const maxLen = Math.max(s1.length, s2.length);
+    
+    return 1 - distance / maxLen;
   }
 }

@@ -306,6 +306,57 @@ export class NewsIntelligenceService {
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // SCHEDULER METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Process recent unprocessed articles (for scheduler)
+   */
+  async processRecent(hours = 6, limit = 200): Promise<ProcessedNews> {
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    // Get unprocessed articles
+    const articles = await this.articlesModel
+      .find({
+        processed: { $ne: true },
+        createdAt: { $gte: cutoff },
+      })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    if (articles.length === 0) {
+      return {
+        events: [],
+        clusters: [],
+        stats: {
+          articlesProcessed: 0,
+          eventsCreated: 0,
+          clustersCreated: 0,
+          entitiesExtracted: 0,
+          entitiesMatched: 0,
+          processingTimeMs: 0,
+        },
+      };
+    }
+
+    // Process articles
+    const result = await this.process(articles);
+
+    // Mark as processed
+    const articleIds = articles.map(a => a._id);
+    await this.articlesModel.updateMany(
+      { _id: { $in: articleIds } },
+      { $set: { processed: true } },
+    ).catch(() => {});
+
+    // Save results
+    await this.saveResults(result);
+
+    return result;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // HELPERS
   // ═══════════════════════════════════════════════════════════════
 

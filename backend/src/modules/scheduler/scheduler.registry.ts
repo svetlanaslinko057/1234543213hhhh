@@ -279,12 +279,44 @@ export class SchedulerRegistry {
       priorityTier: 'T2',
       cron: TIER_CRONS.T2,
       enabled: true,
-      dependencies: ['entity_resolution', 'rootdata_full_sync'],
+      dependencies: ['entity_resolution'],
       concurrencyGroup: 'graph_build',
       maxConcurrency: 1,
       timeoutMs: 600000, // 10 min
       handler: 'graphPipeline.run',
       description: 'Block 5: Full pipeline with nodes -> edges -> enrich -> rank -> projections -> snapshot',
+    });
+
+    // NEW: RSS Feeds (Block 2) - Real-time news ingestion
+    this.register({
+      id: 'rss_feeds_sync',
+      name: 'RSS Feeds Sync (All)',
+      kind: 'rss',
+      priorityTier: 'T1',
+      cron: '*/10 * * * *',
+      enabled: true,
+      dependencies: [],
+      concurrencyGroup: 'rss_html',
+      maxConcurrency: 5,
+      timeoutMs: 180000, // 3 min
+      handler: 'rssFeed.fetchAll',
+      description: 'Block 2: Fetch all RSS feeds (CoinDesk, TheBlock, etc.)',
+    });
+
+    // NEW: News Intelligence (Block 6) - Process raw articles
+    this.register({
+      id: 'news_intelligence_process',
+      name: 'News Intelligence Processing',
+      kind: 'news',
+      priorityTier: 'T2',
+      cron: TIER_CRONS.T2,
+      enabled: true,
+      dependencies: ['rss_feeds_sync'],
+      concurrencyGroup: 'default',
+      maxConcurrency: 1,
+      timeoutMs: 300000, // 5 min
+      handler: 'newsIntelligence.processRecent',
+      description: 'Block 6: Extract, normalize, cluster, rank news',
     });
 
     this.register({
