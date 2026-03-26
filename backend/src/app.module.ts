@@ -29,6 +29,9 @@ import { GraphPipelineModule } from './modules/graph-pipeline/graph-pipeline.mod
 // NEW: News Intelligence (Block 6 - Makes system "live")
 import { NewsIntelligenceModule } from './modules/news-intelligence/news-intelligence.module';
 
+// NEW: Telegram Alerts (restored from Python version)
+import { TelegramModule } from './modules/telegram/telegram.module';
+
 @Module({
   imports: [
     // Config
@@ -77,6 +80,9 @@ import { NewsIntelligenceModule } from './modules/news-intelligence/news-intelli
     
     // Block 6: News Intelligence (makes system "live")
     NewsIntelligenceModule,
+    
+    // Telegram Alerts (restored from Python)
+    TelegramModule,
   ],
   controllers: [HealthController, OpenApiController],
 })
