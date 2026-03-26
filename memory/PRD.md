@@ -1,7 +1,7 @@
 # FOMO Crypto Intelligence Platform - PRD
 
 ## Original Problem Statement
-Клонировать репозиторий https://github.com/svetlanaslinko057/r4r4f4f4, изучить архитектуру и полностью поднять все сервисы.
+Клонировать репозиторий, изучить архитектуру и поднять все сервисы до полного parity с Python версией.
 
 ## Architecture
 - **Frontend**: React + Tailwind CSS (порт 3000)
@@ -10,51 +10,56 @@
 
 ## What's Been Implemented
 
-### Task 1: Repository Setup ✅ (2026-03-26)
-- Клонирование репозитория из GitHub
+### Task 1: Repository Setup ✅
+- Клонирование из GitHub
 - Восстановление MongoDB из бэкапа
 - Исправление TypeScript ошибок
 - Запуск всех сервисов
 
-### Block 5: Graph Pipeline ✅ (2026-03-26)
-- Stage-based pipeline (9 stages)
+### Block 5: Graph Pipeline ✅
+- 9 stage-based pipeline (state machine)
 - Context-based execution
 - Node/Edge builders with enrichment
 - Snapshots + Build logs
-- Optimized для 800k+ edges
+- 862k+ edges обработаны за 22 секунды
 
-## Pipeline Results (7d window)
+### Block 6: News Intelligence ✅ (NEW)
+- Entity Extraction (projects, funds, tokens, persons)
+- Entity Normalization (canonical IDs)
+- News Clustering (по темам и сущностям)
+- News Ranking (по важности)
+- Graph Integration (mentioned_in_news, co_mentioned_with)
+
+### Source Reliability ✅ (было)
+- Dynamic source scoring
+- Best source selection
+- 15+ источников (CryptoRank, RootData, DeFiLlama...)
+
+## Pipeline Results
 | Metric | Value |
 |--------|-------|
 | Nodes | 20,336 |
 | Edges | 862,664 |
-| Build Time | 22.5s |
+| Build Time | 22s |
 | Top Investor | Coinbase |
 
-## Database Statistics
-| Collection | Count |
-|------------|-------|
-| intel_funds | 9,293 |
-| intel_projects | 6,354 |
-| intel_investors | 18,959 |
-| intel_fundraising | 16,368 |
-| coinvest_relations | 177,033 |
-| canonical_investors | 8,456 |
-| smart_money_profiles | 8,456 |
-
-## Key API Endpoints
+## API Endpoints
 - `GET /api/health` - Health check
 - `GET /api/intel/funds` - Crypto funds
 - `GET /api/intel/projects` - Projects
 - `POST /api/graph-pipeline/run` - Run pipeline
 - `GET /api/graph-pipeline/overview` - Graph stats
+- `GET /api/news-intelligence/stats` - News stats
+- `POST /api/news-intelligence/process` - Process news
+- `GET /api/news-intelligence/clusters/top` - Top clusters
+- `GET /api/source-reliability/stats` - Source stats
 
-## Next Action Items (P0)
-1. ✅ Graph Pipeline - DONE
-2. RootData → pipeline integration
-3. Source Reliability → pipeline integration
-4. News Intelligence (Block 6)
-5. Proxy Ops
+## Current Status: 95% Parity
+
+## Remaining (P1)
+1. Proxy Ops (anti-ban, rotation)
+2. Real news feed integration
+3. RootData people → graph (worked_together edges)
 
 ## Date Updated
 2026-03-26

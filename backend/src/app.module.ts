@@ -26,6 +26,9 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
 // NEW: Graph Pipeline (Block 5 - Intelligence Engine)
 import { GraphPipelineModule } from './modules/graph-pipeline/graph-pipeline.module';
 
+// NEW: News Intelligence (Block 6 - Makes system "live")
+import { NewsIntelligenceModule } from './modules/news-intelligence/news-intelligence.module';
+
 @Module({
   imports: [
     // Config
@@ -71,6 +74,9 @@ import { GraphPipelineModule } from './modules/graph-pipeline/graph-pipeline.mod
     
     // Block 5: Graph Pipeline (intelligence engine)
     GraphPipelineModule,
+    
+    // Block 6: News Intelligence (makes system "live")
+    NewsIntelligenceModule,
   ],
   controllers: [HealthController, OpenApiController],
 })
