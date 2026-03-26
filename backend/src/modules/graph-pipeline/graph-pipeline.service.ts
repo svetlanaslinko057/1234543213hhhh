@@ -395,22 +395,36 @@ export class GraphPipelineService {
   // ═══════════════════════════════════════════════════════════════
 
   private async createSnapshot(ctx: GraphBuildContext): Promise<void> {
-    const topNodes = ctx.rankedNodes.slice(0, 100);
+    // OPTIMIZATION: Don't store full graph in snapshot - too large (177k+ edges)
+    // Store only top nodes/edges and lightweight projections
+    
+    const topNodes = ctx.rankedNodes.slice(0, 500);
     const topEdges = [...ctx.allEdges.values()]
       .sort((a, b) => b.weight * b.confidence - a.weight * a.confidence)
-      .slice(0, 200);
+      .slice(0, 1000);
 
-    const snapshot: GraphSnapshot = {
+    // Lightweight projections (node IDs and edge keys only, not full objects)
+    const lightProjections = ctx.projections.map(p => ({
+      key: p.key,
+      nodeCount: p.nodeIds.length,
+      edgeCount: p.edgeKeys.length,
+      topNodeIds: p.nodeIds.slice(0, 100),
+      topEdgeKeys: p.edgeKeys.slice(0, 200),
+      stats: p.stats,
+    }));
+
+    const snapshot = {
       buildId: ctx.buildId,
       window: ctx.window,
       createdAt: new Date(),
 
-      nodes: ctx.rankedNodes,
-      edges: [...ctx.allEdges.values()],
-      projections: ctx.projections,
+      // Store only top entities (not full graph)
+      nodes: topNodes,
+      edges: topEdges,
+      projections: lightProjections,
 
-      topNodes,
-      topEdges,
+      topNodes: topNodes.slice(0, 100),
+      topEdges: topEdges.slice(0, 200),
 
       stats: ctx.stats,
 
@@ -420,10 +434,12 @@ export class GraphPipelineService {
         rootDataSourceId: ctx.sources.rootDataSourceId,
         warnings: ctx.warnings,
         version: PIPELINE_VERSION,
+        fullNodeCount: ctx.rankedNodes.length,
+        fullEdgeCount: ctx.allEdges.size,
       },
     };
 
-    await this.snapshotRepo.create(snapshot);
+    await this.snapshotRepo.create(snapshot as any);
   }
 
   // ═══════════════════════════════════════════════════════════════

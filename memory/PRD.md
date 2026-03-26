@@ -4,18 +4,32 @@
 Клонировать репозиторий https://github.com/svetlanaslinko057/r4r4f4f4, изучить архитектуру и полностью поднять все сервисы.
 
 ## Architecture
-- **Frontend**: React с Tailwind CSS, порт 3000
-- **Backend**: NestJS (TypeScript) проксируется через FastAPI, порт 8001
-- **NestJS**: Порт 3001 (внутренний)
+- **Frontend**: React + Tailwind CSS (порт 3000)
+- **Backend**: NestJS через FastAPI proxy (порты 8001 → 3001)
 - **Database**: MongoDB (fomo_market)
 
-## Core Features Implemented
-- ✅ Клонирование репозитория из GitHub
-- ✅ Восстановление базы данных из бэкапа (177k+ записей)
-- ✅ Миграция данных (funds, projects)
-- ✅ Сборка NestJS бэкенда (исправлены TypeScript ошибки)
-- ✅ Запуск всех сервисов через supervisor
-- ✅ API эндпоинты работают
+## What's Been Implemented
+
+### Task 1: Repository Setup ✅ (2026-03-26)
+- Клонирование репозитория из GitHub
+- Восстановление MongoDB из бэкапа
+- Исправление TypeScript ошибок
+- Запуск всех сервисов
+
+### Block 5: Graph Pipeline ✅ (2026-03-26)
+- Stage-based pipeline (9 stages)
+- Context-based execution
+- Node/Edge builders with enrichment
+- Snapshots + Build logs
+- Optimized для 800k+ edges
+
+## Pipeline Results (7d window)
+| Metric | Value |
+|--------|-------|
+| Nodes | 20,336 |
+| Edges | 862,664 |
+| Build Time | 22.5s |
+| Top Investor | Coinbase |
 
 ## Database Statistics
 | Collection | Count |
@@ -24,28 +38,23 @@
 | intel_projects | 6,354 |
 | intel_investors | 18,959 |
 | intel_fundraising | 16,368 |
+| coinvest_relations | 177,033 |
 | canonical_investors | 8,456 |
 | smart_money_profiles | 8,456 |
-| coinvest_relations | 177,033 |
 
 ## Key API Endpoints
 - `GET /api/health` - Health check
 - `GET /api/intel/funds` - Crypto funds
 - `GET /api/intel/projects` - Projects
-- `GET /api/intel/investors/top` - Top investors
-- `GET /api/entities/stats` - Entity resolution stats
-- `GET /api/smart-money/stats` - Smart money analytics
-- `POST /api/auth/verify` - Authentication (password: fomo2024)
+- `POST /api/graph-pipeline/run` - Run pipeline
+- `GET /api/graph-pipeline/overview` - Graph stats
 
-## What's Working
-- All backend APIs (tested via localhost:8001)
-- MongoDB with restored data
-- NestJS build and runtime
-- Frontend UI (login page)
+## Next Action Items (P0)
+1. ✅ Graph Pipeline - DONE
+2. RootData → pipeline integration
+3. Source Reliability → pipeline integration
+4. News Intelligence (Block 6)
+5. Proxy Ops
 
-## Known Issues
-- External URL proxy may have delays during NestJS startup
-- Browser-based scraping disabled (Chromium not configured)
-
-## Date Completed
+## Date Updated
 2026-03-26
